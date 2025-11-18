@@ -1,0 +1,33 @@
+pipeline {
+  agent {
+    docker {
+      image 'python:3.11-slim'
+      args  '-u'
+    }
+  }
+
+  stages {
+    stage('Install Dependencies') {
+      steps {
+        sh 'python -m pip install --upgrade pip'
+        sh 'pip install -r requirements.txt'
+      }
+    }
+
+    stage('Run') {
+      steps {
+        sh 'python main.py'
+      }
+    }
+  }
+
+  post {
+    success {
+      archiveArtifacts artifacts: 'performance_chart.png', fingerprint: true
+      echo '🎉 Docker Jenkins Pipeline Success!'
+    }
+    failure {
+      echo '❌ Docker Jenkins Pipeline Failed!'
+    }
+  }
+}
